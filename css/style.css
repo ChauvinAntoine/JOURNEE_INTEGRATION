@@ -205,6 +205,27 @@ input[type="password"]:focus {
   border-bottom-right-radius: 4px;
 }
 
+.quick-replies {
+  display: flex;
+  gap: 8px;
+  padding: 8px 12px 0;
+}
+
+.quick-btn {
+  background: transparent;
+  color: var(--green-dark);
+  border: 1px solid var(--green);
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.quick-btn:hover {
+  background: var(--green-light);
+}
+
 .chat-form {
   display: flex;
   gap: 8px;
@@ -308,6 +329,10 @@ body.mobile .chat-container {
 
 body.mobile .msg {
   max-width: 88%;
+}
+
+body.mobile .quick-replies {
+  flex-wrap: wrap;
 }
 
 body.mobile .chat-form input {

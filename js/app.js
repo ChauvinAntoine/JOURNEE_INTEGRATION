@@ -85,10 +85,33 @@ function showView(name) {
 
 const chatMessages = document.getElementById("chat-messages");
 
+// Tableaux normalisés (insensibles à la casse)
+const TEAM_PASSWORD_MAP = {};
+Object.keys(TEAM_PASSWORDS).forEach(k => {
+  TEAM_PASSWORD_MAP[k.toUpperCase()] = TEAM_PASSWORDS[k];
+});
+
+const TEAM_MAP = {};
+Object.keys(TEAMS).forEach(k => {
+  TEAM_MAP[k.toUpperCase()] = TEAMS[k];
+});
+
+function teamColor(team) {
+  const t = TEAM_MAP[team];
+  return t ? t.color : null;
+}
+
 function addMessage(text, who) {
   const div = document.createElement("div");
   div.className = "msg " + who;
   div.textContent = text;
+  if (who === "team") {
+    const color = teamColor(state.team);
+    if (color) {
+      div.style.background = color;
+      div.style.color = "#fff";
+    }
+  }
   chatMessages.appendChild(div);
   chatMessages.scrollTop = chatMessages.scrollHeight;
   return div;
@@ -108,6 +131,7 @@ function finalClueText() {
 function renderChat() {
   chatMessages.innerHTML = "";
   addBotMessage("Bienvenue, " + state.team + " ! Résolvez les énigmes pour gagner des mots. À la fin, tous les mots vous aideront à ouvrir le local à ballons. Bonne chance !");
+  addBotMessage("RDV au plan d'évacuation.");
 
   if (PUZZLES.length === 0) {
     addBotMessage("Les énigmes arrivent bientôt… Revenez plus tard !");
@@ -146,16 +170,24 @@ function renderWords() {
     list.appendChild(empty);
     return;
   }
+  const color = teamColor(state.team);
   state.words.forEach(word => {
     const chip = document.createElement("span");
     chip.className = "word-chip";
     chip.textContent = word;
+    if (color) {
+      chip.style.background = color;
+      chip.style.color = "#fff";
+    }
     list.appendChild(chip);
   });
 }
 
 function renderGame() {
-  document.getElementById("team-label").textContent = "Équipe : " + state.team;
+  const label = document.getElementById("team-label");
+  label.textContent = "Équipe : " + state.team;
+  const color = teamColor(state.team);
+  if (color) label.style.color = color;
   renderWords();
   renderChat();
   updateHintBubble();
@@ -215,16 +247,19 @@ function showLoginError(msg) {
 
 loginForm.addEventListener("submit", (e) => {
   e.preventDefault();
-  const team = document.getElementById("team-name").value.trim();
+  const rawTeam = document.getElementById("team-name").value.trim();
   const pass = document.getElementById("team-pass").value;
 
-  if (!team) {
+  if (!rawTeam) {
     showLoginError("Veuillez saisir le nom de votre équipe.");
     return;
   }
 
-  const expected = (TEAM_PASSWORDS[team] !== undefined)
-    ? TEAM_PASSWORDS[team]
+  // Nom d'équipe normalisé (insensible à la casse)
+  const team = rawTeam.toUpperCase();
+
+  const expected = (TEAM_PASSWORD_MAP[team] !== undefined)
+    ? TEAM_PASSWORD_MAP[team]
     : GLOBAL_PASSWORD;
 
   if (pass !== expected) {
@@ -255,26 +290,20 @@ document.getElementById("logout-btn").addEventListener("click", () => {
 const chatForm = document.getElementById("chat-form");
 const chatInput = document.getElementById("chat-input");
 
-chatForm.addEventListener("submit", (e) => {
-  e.preventDefault();
-  const answer = chatInput.value.trim();
-  if (!answer) return;
-  chatInput.value = "";
-
+function sendAnswer(answer) {
   const current = PUZZLES[state.currentIndex];
+
+  addTeamMessage(answer);
 
   if (!current) {
     // Aucune énigme en cours
     if (PUZZLES.length === 0) {
       addBotMessage("Les énigmes arrivent bientôt… Revenez plus tard !");
     } else {
-      addTeamMessage(answer);
       addBotMessage("Toutes les énigmes sont déjà résolues ! " + finalClueText());
     }
     return;
   }
-
-  addTeamMessage(answer);
 
   if (answer.toLowerCase() === current.answer.toLowerCase()) {
     state.solved[current.id] = true;
@@ -303,6 +332,35 @@ chatForm.addEventListener("submit", (e) => {
     addBotMessage("Mauvaise réponse, réessayez !");
     updateHintBubble();
   }
+}
+
+chatForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const answer = chatInput.value.trim();
+  if (!answer) return;
+  chatInput.value = "";
+  sendAnswer(answer);
+});
+
+// Réponses rapides pré-définies (statut, pas des réponses d'énigme)
+function sendQuickReply(msg) {
+  addTeamMessage(msg);
+  if (msg === "J'y suis") {
+    const current = PUZZLES[state.currentIndex];
+    if (current && current.arrivalMessage) {
+      addBotMessage(current.arrivalMessage);
+    } else {
+      addBotMessage("Parfait ! Restez sur place.");
+    }
+  } else if (msg === "J'ai un problème") {
+    addBotMessage("Les game masters sont disponibles sur le terrain.");
+  }
+}
+
+document.querySelectorAll(".quick-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    sendQuickReply(btn.dataset.msg);
+  });
 });
 
 // ---------- Version ordinateur / téléphone ----------

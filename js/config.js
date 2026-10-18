@@ -10,7 +10,19 @@ const GLOBAL_PASSWORD = "integration2026";
 // Sinon, le mot de passe global ci-dessus est utilisé.
 const TEAM_PASSWORDS = {
   "admin": "admin",
-  // "Nom de l'équipe": "motdepasse",
+  // "EQUIPE1": "initiales",
+  // "EQUIPE2": "initiales",
+  // "EQUIPE3": "initiales",
+  // "EQUIPE4": "initiales",
+};
+
+// Équipes et leurs couleurs (utilisées dans le chat et l'affichage).
+const TEAMS = {
+  "EQUIPE1": { color: "#d32f2f" }, // rouge
+  "EQUIPE2": { color: "#2e7d32" }, // vert
+  "EQUIPE3": { color: "#1565c0" }, // bleu
+  "EQUIPE4": { color: "#f9a825" }, // jaune
+  "admin":   { color: "#ef6c00" }  // orange
 };
 
 // Indice final affiché quand toutes les énigmes sont résolues.
