@@ -9,6 +9,7 @@ const state = {
   attempts: {},         // puzzleId -> nombre de mauvaises réponses
   answers: {},          // puzzleId -> réponse saisie par l'équipe
   currentIndex: 0,      // index de l'énigme en cours
+  presented: {},        // puzzleId -> true si l'énigme a été présentée (après "J'y suis")
   puzzleStartedAt: {},  // puzzleId -> horodatage de début de l'épreuve
   nudged: {}            // puzzleId -> true si le message "Trop dur ?" a déjà été envoyé
 };
@@ -29,6 +30,7 @@ function save() {
     attempts: state.attempts,
     answers: state.answers,
     currentIndex: state.currentIndex,
+    presented: state.presented,
     puzzleStartedAt: state.puzzleStartedAt,
     nudged: state.nudged
   }));
@@ -40,6 +42,7 @@ function load(team) {
   state.attempts = {};
   state.answers = {};
   state.currentIndex = 0;
+  state.presented = {};
   state.puzzleStartedAt = {};
   state.nudged = {};
   try {
@@ -51,6 +54,7 @@ function load(team) {
       state.attempts = data.attempts || {};
       state.answers = data.answers || {};
       state.currentIndex = data.currentIndex || 0;
+      state.presented = data.presented || {};
       state.puzzleStartedAt = data.puzzleStartedAt || {};
       state.nudged = data.nudged || {};
     }
@@ -65,6 +69,7 @@ function resetState() {
   state.attempts = {};
   state.answers = {};
   state.currentIndex = 0;
+  state.presented = {};
   state.puzzleStartedAt = {};
   state.nudged = {};
 }
@@ -120,12 +125,15 @@ function addMessage(text, who) {
 function addBotMessage(text) { return addMessage(text, "bot"); }
 function addTeamMessage(text) { return addMessage(text, "team"); }
 
-function puzzleText(puzzle, index) {
-  return "Énigme " + (index + 1) + " — " + puzzle.title + "\n" + puzzle.description;
-}
-
 function finalClueText() {
   return FINAL_CLUE.replace("{MOTS}", state.words.join(" "));
+}
+
+// Affiche une énigme : titre, message d'arrivée, description
+function showPuzzle(puzzle) {
+  addBotMessage(puzzle.title);
+  addBotMessage(puzzle.arrivalMessage);
+  addBotMessage(puzzle.description);
 }
 
 function renderChat() {
@@ -139,20 +147,22 @@ function renderChat() {
   }
 
   // Historique des énigmes déjà résolues
-  PUZZLES.forEach((puzzle, i) => {
+  PUZZLES.forEach((puzzle) => {
     if (state.solved[puzzle.id]) {
-      addBotMessage(puzzleText(puzzle, i));
+      showPuzzle(puzzle);
       addTeamMessage(state.answers[puzzle.id] || puzzle.answer);
       addBotMessage("Bravo ! Vous avez gagné le mot : " + puzzle.rewardWord);
     }
   });
 
-  // Énigme en cours
+  // Énigme en cours (affichée seulement après "J'y suis")
   const current = PUZZLES[state.currentIndex];
   if (current) {
-    addBotMessage(puzzleText(current, state.currentIndex));
-    if (state.nudged[current.id]) {
-      addBotMessage("Trop dur ? Demandez un indice aux game masters");
+    if (state.presented[current.id]) {
+      showPuzzle(current);
+      if (state.nudged[current.id]) {
+        addBotMessage("Trop dur ? Demandez un indice aux game masters");
+      }
     }
   } else {
     addBotMessage("Toutes les énigmes sont résolues, bravo !");
@@ -271,7 +281,6 @@ loginForm.addEventListener("submit", (e) => {
   load(team);
   loginError.hidden = true;
   loginForm.reset();
-  markPuzzleStarted();
   renderGame();
   showView("game");
 });
@@ -305,6 +314,12 @@ function sendAnswer(answer) {
     return;
   }
 
+  // L'énigme n'a pas encore été présentée (l'équipe n'a pas dit "J'y suis")
+  if (!state.presented[current.id]) {
+    addBotMessage("D'abord, rendez-vous sur place et cliquez sur « J'y suis ».");
+    return;
+  }
+
   if (answer.toLowerCase() === current.answer.toLowerCase()) {
     state.solved[current.id] = true;
     state.answers[current.id] = answer;
@@ -312,7 +327,6 @@ function sendAnswer(answer) {
       state.words.push(current.rewardWord);
     }
     state.currentIndex++;
-    markPuzzleStarted();
     save();
     renderWords();
     updateHintBubble();
@@ -321,7 +335,7 @@ function sendAnswer(answer) {
 
     const next = PUZZLES[state.currentIndex];
     if (next) {
-      addBotMessage(puzzleText(next, state.currentIndex));
+      addBotMessage("Nouvelle étape ! Rendez-vous sur place et cliquez sur « J'y suis » quand vous êtes arrivé.");
     } else {
       addBotMessage("Toutes les énigmes sont résolues, bravo !");
       addBotMessage(finalClueText());
@@ -329,7 +343,7 @@ function sendAnswer(answer) {
   } else {
     state.attempts[current.id] = (state.attempts[current.id] || 0) + 1;
     save();
-    addBotMessage("Mauvaise réponse, réessayez !");
+    addBotMessage("Aïe... il va falloir réfléchir un peu plus visiblement.");
     updateHintBubble();
   }
 }
@@ -347,8 +361,11 @@ function sendQuickReply(msg) {
   addTeamMessage(msg);
   if (msg === "J'y suis") {
     const current = PUZZLES[state.currentIndex];
-    if (current && current.arrivalMessage) {
-      addBotMessage(current.arrivalMessage);
+    if (current && !state.solved[current.id] && !state.presented[current.id]) {
+      state.presented[current.id] = true;
+      markPuzzleStarted();
+      save();
+      showPuzzle(current);
     } else {
       addBotMessage("Parfait ! Restez sur place.");
     }

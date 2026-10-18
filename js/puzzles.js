@@ -11,13 +11,13 @@
 //   hint           : indice optionnel, à donner UNIQUEMENT par les game masters
 //                    (jamais affiché dans l'application)
 const PUZZLES = [
-  // {
-  //   id: 1,
-  //   title: "Énigme 1",
-  //   description: "Texte de l'énigme…",
-  //   answer: "MOT",
-  //   rewardWord: "MOT",
-  //   arrivalMessage: "Message affiché quand l'équipe dit « J'y suis »…",
-  //   hint: "Indice optionnel…"
-  // }
+  {
+    id: 1,
+    title: "Bazar dans le dojo",
+    arrivalMessage: "C'est le chaos dans le dojo. Et si vous rangiez vos affaires pour récupérer un premier indice ?",
+    description: "Inscrivez le mot découvert pour avancer dans vos recherches.",
+    answer: "TERRAIN",
+    rewardWord: "TERRAIN",
+    hint: ""
+  }
 ];
