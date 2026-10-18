@@ -129,11 +129,59 @@ function finalClueText() {
   return FINAL_CLUE.replace("{MOTS}", state.words.join(" "));
 }
 
-// Affiche une énigme : titre, message d'arrivée, description
+// Affiche une énigme : titre, message d'arrivée, audio/image/pdf (optionnels), description
 function showPuzzle(puzzle) {
   addBotMessage(puzzle.title);
   addBotMessage(puzzle.arrivalMessage);
+  if (puzzle.audio) {
+    addAudioMessage(puzzle.audio);
+  }
+  if (puzzle.image) {
+    addImageMessage(puzzle.image);
+  }
+  if (puzzle.pdf) {
+    addPdfMessage(puzzle.pdf);
+  }
   addBotMessage(puzzle.description);
+}
+
+// Ajoute une bulle avec un lecteur audio
+function addAudioMessage(src) {
+  const div = document.createElement("div");
+  div.className = "msg bot audio-msg";
+  const audio = document.createElement("audio");
+  audio.controls = true;
+  audio.src = src;
+  div.appendChild(audio);
+  chatMessages.appendChild(div);
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+  return div;
+}
+
+// Ajoute une bulle avec une image
+function addImageMessage(src) {
+  const div = document.createElement("div");
+  div.className = "msg bot image-msg";
+  const img = document.createElement("img");
+  img.src = src;
+  img.alt = "Image de l'énigme";
+  div.appendChild(img);
+  chatMessages.appendChild(div);
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+  return div;
+}
+
+// Ajoute une bulle avec un document PDF
+function addPdfMessage(src) {
+  const div = document.createElement("div");
+  div.className = "msg bot pdf-msg";
+  const iframe = document.createElement("iframe");
+  iframe.src = src;
+  iframe.title = "Document de l'énigme";
+  div.appendChild(iframe);
+  chatMessages.appendChild(div);
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+  return div;
 }
 
 function renderChat() {
@@ -151,7 +199,7 @@ function renderChat() {
     if (state.solved[puzzle.id]) {
       showPuzzle(puzzle);
       addTeamMessage(state.answers[puzzle.id] || puzzle.answer);
-      addBotMessage("Bravo ! Vous avez gagné le mot : " + puzzle.rewardWord);
+      addBotMessage("Bravo ! Vous avez gagné le mot : " + puzzle.answer);
     }
   });
 
@@ -323,15 +371,15 @@ function sendAnswer(answer) {
   if (answer.toLowerCase() === current.answer.toLowerCase()) {
     state.solved[current.id] = true;
     state.answers[current.id] = answer;
-    if (!state.words.includes(current.rewardWord)) {
-      state.words.push(current.rewardWord);
+    if (!state.words.includes(current.answer)) {
+      state.words.push(current.answer);
     }
     state.currentIndex++;
     save();
     renderWords();
     updateHintBubble();
 
-    addBotMessage("Bravo ! Vous avez gagné le mot : " + current.rewardWord);
+    addBotMessage("Bravo ! Vous avez gagné le mot : " + current.answer);
 
     const next = PUZZLES[state.currentIndex];
     if (next) {
