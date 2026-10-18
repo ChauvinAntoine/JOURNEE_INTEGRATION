@@ -10,10 +10,10 @@ const GLOBAL_PASSWORD = "integration2026";
 // Sinon, le mot de passe global ci-dessus est utilisé.
 const TEAM_PASSWORDS = {
   "admin": "admin",
-  // "EQUIPE1": "initiales",
-  // "EQUIPE2": "initiales",
-  // "EQUIPE3": "initiales",
-  // "EQUIPE4": "initiales",
+  "EQUIPE1": "test",
+  "EQUIPE2": "test",
+  "EQUIPE3": "test",
+  "EQUIPE4": "test"
 };
 
 // Équipes et leurs couleurs (utilisées dans le chat et l'affichage).

@@ -66,8 +66,26 @@ const PUZZLES = [
   {
     id: 8,
     title: "Le voleur de lettres",
-    arrivalMessage: "Le coach adverse a essayé de faire passer un message à ses joueurs. Essayons de le retrouver pour contrer leur tactique.",
-    description: "Inscrivez le mot découvert pour avancer dans vos recherches.",
+    arrivalMessage: "MESSAGE_D_ARRIVEE",
+    description: "DESCRIPTION",
     answer: "PANIER"
   }
 ];
+
+// ============================================================
+// PARCOURS - un ordre d'énigmes par équipe
+// ============================================================
+// Hypothèse : chaque énigme dure 5 minutes et toutes les équipes
+// démarrent en même temps. Les parcours sont construits pour que,
+// à chaque tranche de 5 minutes, les 4 équipes soient sur 4
+// énigmes DIFFÉRENTES (jamais deux équipes sur la même énigme).
+//
+// Chaque équipe fait les 8 énigmes, dans un ordre différent.
+// (admin suit l'ordre 1→8 pour les tests.)
+const ROUTES = {
+  "EQUIPE1": [1, 5, 7, 2, 4, 6, 3, 8],
+  "EQUIPE2": [2, 8, 6, 3, 5, 1, 7, 4],
+  "EQUIPE3": [6, 3, 4, 1, 7, 2, 8, 5],
+  "EQUIPE4": [4, 7, 2, 5, 8, 3, 1, 6],
+  "admin":   [1, 2, 3, 4, 5, 6, 7, 8]
+};

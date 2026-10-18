@@ -129,6 +129,27 @@ function finalClueText() {
   return FINAL_CLUE.replace("{MOTS}", state.words.join(" "));
 }
 
+// ---------- Parcours (ordre des énigmes par équipe) ----------
+
+// Récupère le parcours (liste d'ids d'énigmes) d'une équipe.
+function getRoute(team) {
+  return ROUTES[team] || PUZZLES.map(p => p.id);
+}
+
+// Énigme en cours pour l'équipe connectée.
+function currentPuzzle() {
+  const route = getRoute(state.team);
+  const id = route[state.currentIndex];
+  return PUZZLES.find(p => p.id === id) || null;
+}
+
+// Énigme suivante dans le parcours de l'équipe connectée.
+function nextPuzzle() {
+  const route = getRoute(state.team);
+  const id = route[state.currentIndex + 1];
+  return PUZZLES.find(p => p.id === id) || null;
+}
+
 // Affiche une énigme : titre, message d'arrivée, audio/image/pdf (optionnels), description
 function showPuzzle(puzzle) {
   addBotMessage(puzzle.title);
@@ -204,7 +225,7 @@ function renderChat() {
   });
 
   // Énigme en cours (affichée seulement après "J'y suis")
-  const current = PUZZLES[state.currentIndex];
+  const current = currentPuzzle();
   if (current) {
     if (state.presented[current.id]) {
       showPuzzle(current);
@@ -272,7 +293,7 @@ document.getElementById("hint-btn").addEventListener("click", () => {
 // le bot envoie un message pour l'orienter vers les game masters.
 
 function markPuzzleStarted() {
-  const current = PUZZLES[state.currentIndex];
+  const current = currentPuzzle();
   if (current && !state.puzzleStartedAt[current.id]) {
     state.puzzleStartedAt[current.id] = Date.now();
     save();
@@ -281,7 +302,7 @@ function markPuzzleStarted() {
 
 function checkNudge() {
   if (!state.team) return;
-  const current = PUZZLES[state.currentIndex];
+  const current = currentPuzzle();
   if (!current || state.solved[current.id] || state.nudged[current.id]) return;
   const startedAt = state.puzzleStartedAt[current.id];
   if (startedAt && Date.now() - startedAt >= NUDGE_DELAY_MS) {
@@ -348,7 +369,7 @@ const chatForm = document.getElementById("chat-form");
 const chatInput = document.getElementById("chat-input");
 
 function sendAnswer(answer) {
-  const current = PUZZLES[state.currentIndex];
+  const current = currentPuzzle();
 
   addTeamMessage(answer);
 
@@ -381,7 +402,7 @@ function sendAnswer(answer) {
 
     addBotMessage("Bravo ! Vous avez gagné le mot : " + current.answer);
 
-    const next = PUZZLES[state.currentIndex];
+    const next = nextPuzzle();
     if (next) {
       addBotMessage("Nouvelle étape ! Rendez-vous sur place et cliquez sur « J'y suis » quand vous êtes arrivé.");
     } else {
@@ -408,7 +429,7 @@ chatForm.addEventListener("submit", (e) => {
 function sendQuickReply(msg) {
   addTeamMessage(msg);
   if (msg === "J'y suis") {
-    const current = PUZZLES[state.currentIndex];
+    const current = currentPuzzle();
     if (current && !state.solved[current.id] && !state.presented[current.id]) {
       state.presented[current.id] = true;
       markPuzzleStarted();
