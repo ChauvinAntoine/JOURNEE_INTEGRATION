@@ -141,6 +141,12 @@ input[type="password"]:focus {
   margin: 0 0 8px;
 }
 
+.header-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
 /* ---------- Mots gagnés ---------- */
 .words-list {
   display: flex;

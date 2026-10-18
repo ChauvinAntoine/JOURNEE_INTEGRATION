@@ -24,7 +24,3 @@ const TEAMS = {
   "EQUIPE4": { color: "#f9a825" }, // jaune
   "admin":   { color: "#ef6c00" }  // orange
 };
-
-// Indice final affiché quand toutes les énigmes sont résolues.
-// Le placeholder {MOTS} est remplacé par les mots gagnés, dans l'ordre.
-const FINAL_CLUE = "Les mots gagnés forment votre indice final : {MOTS}";

@@ -125,10 +125,6 @@ function addMessage(text, who) {
 function addBotMessage(text) { return addMessage(text, "bot"); }
 function addTeamMessage(text) { return addMessage(text, "team"); }
 
-function finalClueText() {
-  return FINAL_CLUE.replace("{MOTS}", state.words.join(" "));
-}
-
 // ---------- Parcours (ordre des énigmes par équipe) ----------
 
 // Récupère le parcours (liste d'ids d'énigmes) d'une équipe.
@@ -143,11 +139,11 @@ function currentPuzzle() {
   return PUZZLES.find(p => p.id === id) || null;
 }
 
-// Énigme suivante dans le parcours de l'équipe connectée.
-function nextPuzzle() {
-  const route = getRoute(state.team);
-  const id = route[state.currentIndex + 1];
-  return PUZZLES.find(p => p.id === id) || null;
+// Marque une énigme comme présentée (démarre le chrono) sans l'afficher.
+function markPresented(puzzle) {
+  state.presented[puzzle.id] = true;
+  markPuzzleStarted();
+  save();
 }
 
 // Affiche une énigme : titre, message d'arrivée, audio/image/pdf (optionnels), description
@@ -224,9 +220,12 @@ function renderChat() {
     }
   });
 
-  // Énigme en cours (affichée seulement après "J'y suis")
+  // Énigme en cours (affichée après "J'y suis", ou automatiquement si autoPresent)
   const current = currentPuzzle();
   if (current) {
+    if (current.autoPresent && !state.presented[current.id]) {
+      markPresented(current);
+    }
     if (state.presented[current.id]) {
       showPuzzle(current);
       if (state.nudged[current.id]) {
@@ -234,8 +233,7 @@ function renderChat() {
       }
     }
   } else {
-    addBotMessage("Toutes les énigmes sont résolues, bravo !");
-    addBotMessage(finalClueText());
+    addBotMessage("Toutes les énigmes sont résolues, bravo ! Il est temps de retrouver les game masters.");
   }
 }
 
@@ -354,6 +352,17 @@ loginForm.addEventListener("submit", (e) => {
   showView("game");
 });
 
+// ---------- Réinitialisation ----------
+
+document.getElementById("reset-btn").addEventListener("click", () => {
+  if (!state.team) return;
+  if (!confirm("Réinitialiser la progression de l'équipe " + state.team + " ?")) return;
+  resetState();
+  localStorage.removeItem(storageKey(state.team));
+  document.getElementById("hint-tooltip").hidden = true;
+  renderGame();
+});
+
 // ---------- Déconnexion ----------
 
 document.getElementById("logout-btn").addEventListener("click", () => {
@@ -378,15 +387,20 @@ function sendAnswer(answer) {
     if (PUZZLES.length === 0) {
       addBotMessage("Les énigmes arrivent bientôt… Revenez plus tard !");
     } else {
-      addBotMessage("Toutes les énigmes sont déjà résolues ! " + finalClueText());
+      addBotMessage("Toutes les énigmes sont résolues, bravo ! Il est temps de retrouver les game masters.");
     }
     return;
   }
 
   // L'énigme n'a pas encore été présentée (l'équipe n'a pas dit "J'y suis")
   if (!state.presented[current.id]) {
-    addBotMessage("D'abord, rendez-vous sur place et cliquez sur « J'y suis ».");
-    return;
+    if (current.autoPresent) {
+      markPresented(current);
+      showPuzzle(current);
+    } else {
+      addBotMessage("D'abord, rendez-vous sur place et cliquez sur « J'y suis ».");
+      return;
+    }
   }
 
   if (answer.toLowerCase() === current.answer.toLowerCase()) {
@@ -402,12 +416,18 @@ function sendAnswer(answer) {
 
     addBotMessage("Bravo ! Vous avez gagné le mot : " + current.answer);
 
-    const next = nextPuzzle();
+    // Après l'incrément, l'énigme suivante est la nouvelle énigme en cours
+    const next = currentPuzzle();
     if (next) {
-      addBotMessage("Nouvelle étape ! Rendez-vous sur place et cliquez sur « J'y suis » quand vous êtes arrivé.");
+      if (next.autoPresent) {
+        // Énigme affichée automatiquement, sans déplacement
+        markPresented(next);
+        showPuzzle(next);
+      } else {
+        addBotMessage("Nouvelle étape : rendez-vous à " + next.location + ". Cliquez sur « J'y suis » quand vous êtes arrivé.");
+      }
     } else {
-      addBotMessage("Toutes les énigmes sont résolues, bravo !");
-      addBotMessage(finalClueText());
+      addBotMessage("Toutes les énigmes sont résolues, bravo ! Il est temps de retrouver les game masters.");
     }
   } else {
     state.attempts[current.id] = (state.attempts[current.id] || 0) + 1;
