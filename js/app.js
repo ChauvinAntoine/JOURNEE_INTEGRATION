@@ -386,7 +386,9 @@ loginForm.addEventListener("submit", (e) => {
   load(team);
   loginError.hidden = true;
   loginForm.reset();
+  loginAt = Date.now();
   renderGame();
+  scheduleStartButton();
   showView("game");
 });
 
@@ -400,6 +402,7 @@ document.getElementById("logout-btn").addEventListener("click", () => {
   document.getElementById("hint-tooltip").hidden = true;
   wordsVisible = false;
   updateHintBubble();
+  scheduleStartButton();
   showView("login");
 });
 
@@ -509,6 +512,33 @@ document.querySelectorAll(".quick-btn").forEach(btn => {
   });
 });
 
+// ---------- Délai d'affichage de « J'y suis » ----------
+// Après la connexion, l'équipe doit se rendre au plan d'évacuation :
+// le bouton « J'y suis » n'apparait qu'au bout de 2 minutes.
+
+const START_DELAY_MS = 2 * 60 * 1000;
+let loginAt = 0;
+let startTimer = null;
+
+function scheduleStartButton() {
+  const btn = document.getElementById("present-btn");
+  clearTimeout(startTimer);
+  if (!state.team) {
+    btn.hidden = true;
+    return;
+  }
+  const remaining = START_DELAY_MS - (Date.now() - loginAt);
+  if (remaining <= 0) {
+    btn.hidden = false;
+    return;
+  }
+  btn.hidden = true;
+  startTimer = setTimeout(() => {
+    scheduleStartButton();
+    addBotMessage("Une fois rendu sur les lieux de votre première mission, cliquez sur « J'y suis ».");
+  }, remaining);
+}
+
 // ---------- Version ordinateur / téléphone ----------
 
 const versionDesktopBtn = document.getElementById("version-desktop");
@@ -529,26 +559,6 @@ versionMobileBtn.addEventListener("click", () => {
   applyVersion(true);
   localStorage.setItem("jinteg_version", "mobile");
 });
-
-// ---------- Clavier virtuel (mobile) ----------
-// Quand le clavier s'ouvre, on recale la hauteur de l'app sur la partie
-// visible de l'écran : le formulaire reste au-dessus du clavier et la page
-// ne défile pas sous l'encoche. Les boutons flottants sont masqués pendant
-// la saisie pour ne pas chevaucher « Envoyer ».
-
-function updateAppHeight() {
-  const vv = window.visualViewport;
-  const visible = vv ? Math.min(vv.height, window.innerHeight) : window.innerHeight;
-  document.documentElement.style.setProperty("--app-height", visible + "px");
-  const keyboardOpen = window.innerHeight - visible > 100;
-  document.body.classList.toggle("keyboard-open", keyboardOpen);
-}
-
-if (window.visualViewport) {
-  window.visualViewport.addEventListener("resize", updateAppHeight);
-}
-window.addEventListener("resize", updateAppHeight);
-updateAppHeight();
 
 // ---------- Démarrage ----------
 

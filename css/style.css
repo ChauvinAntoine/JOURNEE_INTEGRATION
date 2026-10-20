@@ -319,18 +319,8 @@ body.mobile {
   display: flex;
   flex-direction: column;
   height: 100vh;
-  height: var(--app-height, 100dvh);
+  height: 100dvh;
   overflow: hidden;
-}
-
-/* Clavier ouvert : on masque les boutons flottants pour éviter tout chevauchement */
-body.mobile.keyboard-open .version-switch,
-body.mobile.keyboard-open .hint-bubble {
-  display: none;
-}
-
-body.mobile.keyboard-open #view-game {
-  padding-bottom: 12px;
 }
 
 body.mobile .topbar {

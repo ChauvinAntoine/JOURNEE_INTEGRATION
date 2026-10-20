@@ -18,9 +18,9 @@
       <p class="subtitle">Entrez le nom de votre équipe et le mot de passe pour commencer l'aventure.</p>
       <form id="login-form">
         <label for="team-name">Nom d'équipe</label>
-        <input id="team-name" type="text" autocomplete="off" placeholder="Ex. : Les Panthères" required />
+        <input id="team-name" type="text" autocomplete="off" placeholder="Ex. : OC Montauban" required />
         <label for="team-pass">Mot de passe</label>
-        <input id="team-pass" type="password" placeholder="Mot de passe" required />
+        <input id="team-pass" type="password" placeholder="Quête INITIALE" required />
         <button type="submit" class="btn primary">Commencer</button>
         <p id="login-error" class="error" hidden></p>
       </form>
@@ -49,7 +49,7 @@
     <div class="chat-container card">
       <div id="chat-messages" class="chat-messages"></div>
       <div class="quick-replies">
-        <button type="button" class="quick-btn" data-msg="J'y suis">J'y suis</button>
+        <button type="button" class="quick-btn" id="present-btn" data-msg="J'y suis" hidden>J'y suis</button>
         <button id="words-toggle" class="words-toggle" type="button" hidden>Afficher les indices</button>
       </div>
       <form id="chat-form" class="chat-form">
