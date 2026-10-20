@@ -231,13 +231,14 @@ let wordsVisible = false;
 function renderWords() {
   const toggle = document.getElementById("words-toggle");
 
-  if (state.words.length === 0) {
+  // Le bouton n'apparait que lorsque toutes les énigmes sont résolues,
+  // et disparait une fois les indices affichés (action définitive).
+  if (state.words.length === 0 || currentPuzzle() !== null) {
     toggle.hidden = true;
-    wordsVisible = false;
     return;
   }
 
-  toggle.hidden = false;
+  toggle.hidden = wordsVisible;
 }
 
 // Bulle affichée dans le chat avec les mots gagnés,
@@ -261,9 +262,11 @@ function addWordsMessage() {
 }
 
 document.getElementById("words-toggle").addEventListener("click", () => {
-  wordsVisible = !wordsVisible;
+  if (wordsVisible) return;
+  // Les indices deviennent un message permanent du chat
+  wordsVisible = true;
   renderWords();
-  renderChat();
+  addWordsMessage();
 });
 
 function renderGame() {
@@ -525,6 +528,11 @@ function scheduleStartButton() {
   clearTimeout(startTimer);
   if (!state.team) {
     btn.hidden = true;
+    return;
+  }
+  // Le compte admin saute l'attente de 2 minutes
+  if (state.team.toLowerCase() === "admin") {
+    btn.hidden = false;
     return;
   }
   const remaining = START_DELAY_MS - (Date.now() - loginAt);

@@ -77,7 +77,7 @@ const PUZZLES = [
   {
     id: 8,
     title: "Le voleur de lettres",
-    location: "LE VESTAIRE VISITEURS",
+    location: "LE VESTIAIRE VISITEURS",
     arrivalMessage: "On dirait que le coach adverse a discuté tactique avec ses joueurs, mais il nous manque des détails...",
     description: "Inscrivez le mot découvert pour avancer dans vos recherches.",
     answer: "PANIER"
