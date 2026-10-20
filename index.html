@@ -30,13 +30,8 @@
   <!-- ==================== PAGE DE JEU (CHATBOT) ==================== -->
   <section id="view-game" class="view" hidden>
     <div class="game-header">
-      <div>
+      <div class="game-header-info">
         <h2 id="team-label"></h2>
-        <div id="words-list" class="words-list"></div>
-      </div>
-      <div class="header-actions">
-        <button id="reset-btn" class="btn ghost">Réinitialiser</button>
-        <button id="logout-btn" class="btn ghost">Déconnexion</button>
       </div>
     </div>
 
@@ -44,7 +39,7 @@
       <div id="chat-messages" class="chat-messages"></div>
       <div class="quick-replies">
         <button type="button" class="quick-btn" data-msg="J'y suis">J'y suis</button>
-        <button type="button" class="quick-btn" data-msg="J'ai un problème">J'ai un problème</button>
+        <button id="words-toggle" class="words-toggle" type="button" hidden>Afficher les indices</button>
       </div>
       <form id="chat-form" class="chat-form">
         <input id="chat-input" type="text" placeholder="Écrivez votre réponse…" autocomplete="off" />
@@ -53,18 +48,23 @@
     </div>
   </section>
 
-  <!-- ==================== INFO-BULLE INDICE ==================== -->
-  <div id="hint-bubble" class="hint-bubble" hidden>
-    <button id="hint-btn" class="hint-btn" type="button">Indice</button>
-    <div id="hint-tooltip" class="hint-tooltip" hidden>
-      Venez voir les game masters pour obtenir un indice.
-    </div>
-  </div>
-
-  <!-- ==================== SÉLECTEUR DE VERSION ==================== -->
+  <!-- ==================== SÉLECTEUR DE VERSION + AIDE ==================== -->
   <div class="version-switch">
     <button id="version-desktop" class="version-btn" type="button">Version ordinateur</button>
     <button id="version-mobile" class="version-btn" type="button">Version téléphone</button>
+  </div>
+
+  <!-- ==================== INFO-BULLE AIDE ==================== -->
+  <span id="hint-bubble" class="hint-bubble" hidden>
+    <button id="hint-btn" class="hint-btn" type="button">A l'aide</button>
+    <div id="hint-tooltip" class="hint-tooltip" hidden>
+      Venez voir les game masters pour obtenir un indice.
+    </div>
+  </span>
+
+  <!-- ==================== DÉCONNEXION ==================== -->
+  <div id="logout-area" class="logout-area" hidden>
+    <button id="logout-btn" class="hint-btn logout-btn" type="button">Déconnexion</button>
   </div>
 
   <script src="js/config.js"></script>

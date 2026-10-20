@@ -11,10 +11,12 @@ const state = {
   currentIndex: 0,      // index de l'énigme en cours
   presented: {},        // puzzleId -> true si l'énigme a été présentée (après "J'y suis")
   puzzleStartedAt: {},  // puzzleId -> horodatage de début de l'épreuve
-  nudged: {}            // puzzleId -> true si le message "Trop dur ?" a déjà été envoyé
+  nudged: {},           // puzzleId -> true si le message "Trop dur ?" a déjà été envoyé
+  penaltyUntil: 0       // horodatage de fin de pénalité (saisie bloquée)
 };
 
 const NUDGE_DELAY_MS = 5 * 60 * 1000; // 5 minutes
+const PENALTY_MS = 2 * 60 * 1000;     // 2 minutes de pénalité après une erreur
 
 // ---------- Persistance (par équipe) ----------
 
@@ -22,19 +24,9 @@ function storageKey(team) {
   return "jinteg_" + team.trim().toLowerCase();
 }
 
-function save() {
-  if (!state.team) return;
-  localStorage.setItem(storageKey(state.team), JSON.stringify({
-    solved: state.solved,
-    words: state.words,
-    attempts: state.attempts,
-    answers: state.answers,
-    currentIndex: state.currentIndex,
-    presented: state.presented,
-    puzzleStartedAt: state.puzzleStartedAt,
-    nudged: state.nudged
-  }));
-}
+// La progression n'est plus sauvegardée : elle repart de zéro à chaque
+// lancement de l'application (voir load).
+function save() {}
 
 function load(team) {
   state.solved = {};
@@ -45,22 +37,10 @@ function load(team) {
   state.presented = {};
   state.puzzleStartedAt = {};
   state.nudged = {};
-  try {
-    const raw = localStorage.getItem(storageKey(team));
-    if (raw) {
-      const data = JSON.parse(raw);
-      state.solved = data.solved || {};
-      state.words = data.words || [];
-      state.attempts = data.attempts || {};
-      state.answers = data.answers || {};
-      state.currentIndex = data.currentIndex || 0;
-      state.presented = data.presented || {};
-      state.puzzleStartedAt = data.puzzleStartedAt || {};
-      state.nudged = data.nudged || {};
-    }
-  } catch (e) {
-    // stockage illisible : on repart de zéro
-  }
+  state.penaltyUntil = 0;
+  // A chaque lancement de l'application, l'avancée repart de zéro :
+  // on efface toute progression sauvegardée pour cette équipe.
+  localStorage.removeItem(storageKey(team));
 }
 
 function resetState() {
@@ -72,6 +52,7 @@ function resetState() {
   state.presented = {};
   state.puzzleStartedAt = {};
   state.nudged = {};
+  state.penaltyUntil = 0;
 }
 
 // ---------- Vues ----------
@@ -193,7 +174,8 @@ function addPdfMessage(src) {
   const div = document.createElement("div");
   div.className = "msg bot pdf-msg";
   const iframe = document.createElement("iframe");
-  iframe.src = src;
+  // view=Fit : la page entière est visible sans faire défiler
+  iframe.src = src + "#toolbar=0&navpanes=0&view=Fit";
   iframe.title = "Document de l'énigme";
   div.appendChild(iframe);
   chatMessages.appendChild(div);
@@ -235,30 +217,54 @@ function renderChat() {
   } else {
     addBotMessage("Toutes les énigmes sont résolues, bravo ! Il est temps de retrouver les game masters.");
   }
+
+  if (wordsVisible && state.words.length > 0) {
+    addWordsMessage();
+  }
 }
 
+// Les mots gagnés (indices pour la finale) sont masqués par défaut,
+// révélés uniquement via le bouton "Afficher les indices".
+
+let wordsVisible = false;
+
 function renderWords() {
-  const list = document.getElementById("words-list");
-  list.innerHTML = "";
+  const toggle = document.getElementById("words-toggle");
+
   if (state.words.length === 0) {
-    const empty = document.createElement("span");
-    empty.className = "words-empty";
-    empty.textContent = "Aucun mot gagné pour l'instant.";
-    list.appendChild(empty);
+    toggle.hidden = true;
+    wordsVisible = false;
     return;
   }
-  const color = teamColor(state.team);
-  state.words.forEach(word => {
-    const chip = document.createElement("span");
-    chip.className = "word-chip";
-    chip.textContent = word;
-    if (color) {
-      chip.style.background = color;
-      chip.style.color = "#fff";
-    }
-    list.appendChild(chip);
-  });
+
+  toggle.hidden = false;
 }
+
+// Bulle affichée dans le chat avec les mots gagnés,
+// un par ligne au format « nom de l'activité : indice »
+function addWordsMessage() {
+  const div = document.createElement("div");
+  div.className = "msg bot words-msg";
+  state.words.forEach(word => {
+    const puzzle = PUZZLES.find(p => p.answer === word);
+    const line = document.createElement("div");
+    line.className = "word-line";
+    line.textContent = (puzzle ? puzzle.title : "") + " : ";
+    const value = document.createElement("span");
+    value.className = "word-value";
+    value.textContent = word;
+    line.appendChild(value);
+    div.appendChild(line);
+  });
+  chatMessages.appendChild(div);
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+document.getElementById("words-toggle").addEventListener("click", () => {
+  wordsVisible = !wordsVisible;
+  renderWords();
+  renderChat();
+});
 
 function renderGame() {
   const label = document.getElementById("team-label");
@@ -268,7 +274,39 @@ function renderGame() {
   renderWords();
   renderChat();
   updateHintBubble();
+  updatePenaltyUI();
 }
+
+// ---------- Pénalité après une erreur ----------
+// Après une mauvaise réponse, la saisie est bloquée pendant 2 minutes.
+
+function penaltyRemaining() {
+  return Math.max(0, (state.penaltyUntil || 0) - Date.now());
+}
+
+function updatePenaltyUI() {
+  const remaining = penaltyRemaining();
+  const locked = remaining > 0 && !!state.team;
+  chatInput.disabled = locked;
+  const sendBtn = chatForm.querySelector("button");
+  if (sendBtn) sendBtn.disabled = locked;
+  if (locked) {
+    const total = Math.ceil(remaining / 1000);
+    const min = Math.floor(total / 60);
+    const sec = total % 60;
+    chatInput.placeholder = "Pénalité : saisie bloquée " + min + ":" + String(sec).padStart(2, "0");
+  } else {
+    chatInput.placeholder = "Écrivez votre réponse…";
+  }
+}
+
+setInterval(() => {
+  const wasLocked = chatInput.disabled;
+  updatePenaltyUI();
+  if (wasLocked && !chatInput.disabled && state.team) {
+    addBotMessage("La pénalité est terminée, vous pouvez répondre à nouveau !");
+  }
+}, 1000);
 
 // ---------- Info-bulle indice ----------
 // L'indice n'est JAMAIS affiché dans le chat : il est disponible
@@ -276,8 +314,8 @@ function renderGame() {
 // pour informer l'équipe qu'elle peut en demander un.
 
 function updateHintBubble() {
-  const bubble = document.getElementById("hint-bubble");
-  bubble.hidden = !state.team;
+  document.getElementById("hint-bubble").hidden = !state.team;
+  document.getElementById("logout-area").hidden = !state.team;
 }
 
 // Clic sur la bulle : affiche / masque le message
@@ -354,21 +392,13 @@ loginForm.addEventListener("submit", (e) => {
 
 // ---------- Réinitialisation ----------
 
-document.getElementById("reset-btn").addEventListener("click", () => {
-  if (!state.team) return;
-  if (!confirm("Réinitialiser la progression de l'équipe " + state.team + " ?")) return;
-  resetState();
-  localStorage.removeItem(storageKey(state.team));
-  document.getElementById("hint-tooltip").hidden = true;
-  renderGame();
-});
-
 // ---------- Déconnexion ----------
 
 document.getElementById("logout-btn").addEventListener("click", () => {
   state.team = null;
   resetState();
   document.getElementById("hint-tooltip").hidden = true;
+  wordsVisible = false;
   showView("login");
 });
 
@@ -379,6 +409,14 @@ const chatInput = document.getElementById("chat-input");
 
 function sendAnswer(answer) {
   const current = currentPuzzle();
+
+  // Pénalité en cours : la saisie est bloquée
+  if (penaltyRemaining() > 0) {
+    addTeamMessage(answer);
+    const secs = Math.ceil(penaltyRemaining() / 1000);
+    addBotMessage("Patientez jusqu'à la fin de la pénalité (" + secs + " secondes restantes) !");
+    return;
+  }
 
   addTeamMessage(answer);
 
@@ -431,9 +469,12 @@ function sendAnswer(answer) {
     }
   } else {
     state.attempts[current.id] = (state.attempts[current.id] || 0) + 1;
+    state.penaltyUntil = Date.now() + PENALTY_MS;
     save();
     addBotMessage("Aïe... il va falloir réfléchir un peu plus visiblement.");
+    addBotMessage("Pénalité : vous ne pouvez plus donner de réponse pendant 2 minutes.");
     updateHintBubble();
+    updatePenaltyUI();
   }
 }
 
@@ -458,8 +499,6 @@ function sendQuickReply(msg) {
     } else {
       addBotMessage("Parfait ! Restez sur place.");
     }
-  } else if (msg === "J'ai un problème") {
-    addBotMessage("Les game masters sont disponibles sur le terrain.");
   }
 }
 

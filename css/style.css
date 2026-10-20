@@ -85,6 +85,17 @@ input[type="password"]:focus {
   border-color: var(--green);
 }
 
+input:disabled {
+  background: #eceff1;
+  color: #90a4ae;
+  cursor: not-allowed;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 /* ---------- Boutons ---------- */
 .btn {
   display: inline-block;
@@ -104,17 +115,6 @@ input[type="password"]:focus {
 
 .btn.primary:hover {
   background: var(--green-dark);
-}
-
-.btn.ghost {
-  background: transparent;
-  color: var(--green);
-  border: 1px solid var(--green);
-  margin-top: 0;
-}
-
-.btn.ghost:hover {
-  background: var(--green-light);
 }
 
 .error {
@@ -141,33 +141,36 @@ input[type="password"]:focus {
   margin: 0 0 8px;
 }
 
-.header-actions {
-  display: flex;
-  gap: 8px;
-  flex-shrink: 0;
+.game-header-info {
+  flex: 1;
+  min-width: 0;
 }
 
 /* ---------- Mots gagnés ---------- */
-.words-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  min-height: 32px;
-}
-
-.words-empty {
-  color: var(--muted);
-  font-style: italic;
-}
-
-.word-chip {
-  display: inline-block;
-  background: var(--green-light);
+.words-toggle {
+  background: transparent;
+  border: 1px solid var(--green-dark);
   color: var(--green-dark);
-  font-weight: 700;
-  letter-spacing: 1px;
-  padding: 6px 14px;
   border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.words-toggle:hover {
+  background: var(--green-light);
+}
+
+.words-msg {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.word-line {
+  font-weight: 400;
 }
 
 /* ---------- Chatbot ---------- */
@@ -233,15 +236,16 @@ input[type="password"]:focus {
 
 .msg.pdf-msg {
   padding: 6px;
+  max-width: 92%;
 }
 
 .msg.pdf-msg iframe {
-  width: 320px;
-  max-width: 100%;
-  height: 420px;
-  border: none;
+  width: min(420px, 100%);
+  height: 50vh;
+  border: 1px solid var(--green-light);
   border-radius: 8px;
   display: block;
+  background: #fff;
 }
 
 .quick-replies {
@@ -378,9 +382,13 @@ body.mobile .chat-form input {
   font-size: 16px; /* évite le zoom auto sur iOS */
 }
 
-body.mobile .hint-bubble {
-  bottom: 80px;
+body.mobile .logout-area {
+  top: 60px;
   right: 12px;
+}
+
+body.mobile .hint-tooltip {
+  width: 200px;
 }
 
 /* ---------- Info-bulle indice ---------- */
@@ -390,10 +398,34 @@ body.mobile .hint-bubble {
 
 .hint-bubble {
   position: fixed;
-  bottom: 20px;
+  bottom: 12px;
+  right: 12px;
+  z-index: 100;
+  display: inline-flex;
+  align-items: center;
+  animation: bubble-in 0.3s ease;
+}
+
+/* ---------- Déconnexion ---------- */
+.logout-area {
+  position: fixed;
+  top: 80px;
   right: 20px;
   z-index: 100;
-  animation: bubble-in 0.3s ease;
+}
+
+.logout-area[hidden] {
+  display: none;
+}
+
+.logout-btn {
+  background: #fff;
+  color: var(--green-dark);
+  border: 1px solid var(--green-dark);
+}
+
+.logout-btn:hover {
+  background: var(--green-light);
 }
 
 .hint-btn {
@@ -415,8 +447,9 @@ body.mobile .hint-bubble {
 
 .hint-tooltip {
   position: absolute;
-  bottom: calc(100% + 10px);
-  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  right: calc(100% + 10px);
   width: 240px;
   background: var(--green-dark);
   color: #fff;
@@ -430,10 +463,11 @@ body.mobile .hint-bubble {
 .hint-tooltip::after {
   content: "";
   position: absolute;
-  top: 100%;
-  right: 24px;
+  left: 100%;
+  top: 50%;
+  transform: translateY(-50%);
   border: 8px solid transparent;
-  border-top-color: var(--green-dark);
+  border-left-color: var(--green-dark);
 }
 
 @keyframes bubble-in {
