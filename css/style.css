@@ -383,8 +383,8 @@ body.mobile .chat-form input {
 }
 
 body.mobile .logout-area {
-  top: 60px;
-  right: 12px;
+  position: static;
+  flex-shrink: 0;
 }
 
 body.mobile .hint-tooltip {
