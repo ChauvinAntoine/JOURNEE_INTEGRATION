@@ -530,6 +530,26 @@ versionMobileBtn.addEventListener("click", () => {
   localStorage.setItem("jinteg_version", "mobile");
 });
 
+// ---------- Clavier virtuel (mobile) ----------
+// Quand le clavier s'ouvre, on recale la hauteur de l'app sur la partie
+// visible de l'écran : le formulaire reste au-dessus du clavier et la page
+// ne défile pas sous l'encoche. Les boutons flottants sont masqués pendant
+// la saisie pour ne pas chevaucher « Envoyer ».
+
+function updateAppHeight() {
+  const vv = window.visualViewport;
+  const visible = vv ? Math.min(vv.height, window.innerHeight) : window.innerHeight;
+  document.documentElement.style.setProperty("--app-height", visible + "px");
+  const keyboardOpen = window.innerHeight - visible > 100;
+  document.body.classList.toggle("keyboard-open", keyboardOpen);
+}
+
+if (window.visualViewport) {
+  window.visualViewport.addEventListener("resize", updateAppHeight);
+}
+window.addEventListener("resize", updateAppHeight);
+updateAppHeight();
+
 // ---------- Démarrage ----------
 
 applyVersion(localStorage.getItem("jinteg_version") === "mobile");
