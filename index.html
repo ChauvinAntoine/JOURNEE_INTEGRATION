@@ -56,7 +56,13 @@
 
   <!-- ==================== INFO-BULLE AIDE ==================== -->
   <span id="hint-bubble" class="hint-bubble" hidden>
-    <button id="hint-btn" class="hint-btn" type="button">A l'aide</button>
+    <button id="hint-btn" class="hint-btn icon-btn" type="button" title="A l'aide" aria-label="A l'aide">
+      <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="10"></circle>
+        <path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 2.4-3 4"></path>
+        <line x1="12" y1="17.5" x2="12" y2="17.5"></line>
+      </svg>
+    </button>
     <div id="hint-tooltip" class="hint-tooltip" hidden>
       Venez voir les game masters pour obtenir un indice.
     </div>
@@ -64,7 +70,13 @@
 
   <!-- ==================== DÉCONNEXION ==================== -->
   <div id="logout-area" class="logout-area" hidden>
-    <button id="logout-btn" class="hint-btn logout-btn" type="button">Déconnexion</button>
+    <button id="logout-btn" class="hint-btn logout-btn icon-btn" type="button" title="Déconnexion" aria-label="Déconnexion">
+      <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+        <polyline points="16 17 21 12 16 7"></polyline>
+        <line x1="21" y1="12" x2="9" y2="12"></line>
+      </svg>
+    </button>
   </div>
 
   <script src="js/config.js"></script>

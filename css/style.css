@@ -445,6 +445,14 @@ body.mobile .hint-tooltip {
   background: var(--green);
 }
 
+.icon-btn {
+  padding: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 0;
+}
+
 .hint-tooltip {
   position: absolute;
   top: 50%;

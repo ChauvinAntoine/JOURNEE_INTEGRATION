@@ -399,6 +399,7 @@ document.getElementById("logout-btn").addEventListener("click", () => {
   resetState();
   document.getElementById("hint-tooltip").hidden = true;
   wordsVisible = false;
+  updateHintBubble();
   showView("login");
 });
 
