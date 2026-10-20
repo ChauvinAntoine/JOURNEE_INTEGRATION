@@ -337,7 +337,7 @@ body.mobile .view {
   max-width: 100%;
   width: 100%;
   margin: 0;
-  padding: 12px 10px 90px;
+  padding: 12px calc(10px + env(safe-area-inset-right)) 90px calc(10px + env(safe-area-inset-left));
 }
 
 body.mobile #view-login {
@@ -358,9 +358,25 @@ body.mobile #view-game {
 }
 
 body.mobile .game-header {
-  flex-direction: column;
+  flex-direction: row;
+  align-items: center;
   gap: 8px;
   flex-shrink: 0;
+}
+
+/* Encoche / zones sûres (safe areas) */
+body.mobile .topbar {
+  padding: calc(12px + env(safe-area-inset-top)) calc(16px + env(safe-area-inset-right)) 12px calc(16px + env(safe-area-inset-left));
+}
+
+body.mobile .version-switch {
+  bottom: calc(12px + env(safe-area-inset-bottom));
+  left: calc(12px + env(safe-area-inset-left));
+}
+
+body.mobile .hint-bubble {
+  right: calc(12px + env(safe-area-inset-right));
+  bottom: calc(12px + env(safe-area-inset-bottom));
 }
 
 body.mobile .chat-container {
