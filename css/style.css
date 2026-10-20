@@ -28,7 +28,7 @@ body {
 .topbar {
   background: var(--green);
   color: #fff;
-  padding: 18px 24px;
+  padding: calc(18px + env(safe-area-inset-top)) calc(24px + env(safe-area-inset-right)) 18px calc(24px + env(safe-area-inset-left));
   text-align: center;
 }
 
@@ -288,8 +288,8 @@ input:disabled {
 /* ---------- Sélecteur de version ---------- */
 .version-switch {
   position: fixed;
-  bottom: 12px;
-  left: 12px;
+  bottom: calc(12px + env(safe-area-inset-bottom));
+  left: calc(12px + env(safe-area-inset-left));
   display: flex;
   gap: 6px;
   z-index: 100;
@@ -414,8 +414,8 @@ body.mobile .hint-tooltip {
 
 .hint-bubble {
   position: fixed;
-  bottom: 12px;
-  right: 12px;
+  bottom: calc(12px + env(safe-area-inset-bottom));
+  right: calc(12px + env(safe-area-inset-right));
   z-index: 100;
   display: inline-flex;
   align-items: center;
