@@ -10,6 +10,7 @@ const state = {
   answers: {},          // puzzleId -> réponse saisie par l'équipe
   currentIndex: 0,      // index de l'énigme en cours
   presented: {},        // puzzleId -> true si l'énigme a été présentée (après "J'y suis")
+  confirmed: {},        // puzzleId -> true si la question de confirmation a reçu "Oui"
   puzzleStartedAt: {},  // puzzleId -> horodatage de début de l'épreuve
   nudged: {},           // puzzleId -> true si le message "Trop dur ?" a déjà été envoyé
   penaltyUntil: 0       // horodatage de fin de pénalité (saisie bloquée)
@@ -35,6 +36,7 @@ function load(team) {
   state.answers = {};
   state.currentIndex = 0;
   state.presented = {};
+  state.confirmed = {};
   state.puzzleStartedAt = {};
   state.nudged = {};
   state.penaltyUntil = 0;
@@ -50,6 +52,7 @@ function resetState() {
   state.answers = {};
   state.currentIndex = 0;
   state.presented = {};
+  state.confirmed = {};
   state.puzzleStartedAt = {};
   state.nudged = {};
   state.penaltyUntil = 0;
@@ -127,9 +130,20 @@ function markPresented(puzzle) {
   save();
 }
 
-// Affiche une énigme : titre, message d'arrivée, audio/image/pdf (optionnels), description
+// Affiche une énigme : titre (+ note), puis après confirmation éventuelle :
+// message d'arrivée, audio/image/pdf (optionnels), description
 function showPuzzle(puzzle) {
-  addBotMessage(puzzle.title);
+  let title = puzzle.title;
+  if (puzzle.note) title += "\n" + puzzle.note;
+  addBotMessage(title);
+  if (puzzle.confirmQuestion && !state.solved[puzzle.id] && !state.confirmed[puzzle.id]) {
+    addBotMessage(puzzle.confirmQuestion);
+    return;
+  }
+  showPuzzleBody(puzzle);
+}
+
+function showPuzzleBody(puzzle) {
   addBotMessage(puzzle.arrivalMessage);
   if (puzzle.audio) {
     addAudioMessage(puzzle.audio);
@@ -446,6 +460,20 @@ function sendAnswer(answer) {
       addBotMessage("D'abord, rendez-vous sur place et cliquez sur « J'y suis ».");
       return;
     }
+  }
+
+  // Question de confirmation en attente (ex. chaussures) : aucune réponse
+  // d'énigme n'est acceptée tant que l'équipe n'a pas répondu « Oui ».
+  if (current.confirmQuestion && !state.solved[current.id] && !state.confirmed[current.id]) {
+    if (answer.toLowerCase().startsWith("oui")) {
+      state.confirmed[current.id] = true;
+      save();
+      addBotMessage("Parfait !");
+      showPuzzleBody(current);
+    } else {
+      addBotMessage("Merci de répondre « Oui » pour commencer cette énigme.");
+    }
+    return;
   }
 
   if (answer.toLowerCase() === current.answer.toLowerCase()) {

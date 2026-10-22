@@ -19,7 +19,9 @@ const PUZZLES = [
     id: 1,
     title: "Bazar dans le dojo",
     location: "DANS LE DOJO",
-    arrivalMessage: "C'est le chaos dans le dojo. Et si vous rangiez vos affaires pour récupérer un premier indice ? MERCI D'ENLEVER VOS CHAUSSURES !",
+    note: "MERCI D'ENLEVER VOS CHAUSSURES !",
+    confirmQuestion: "Avez-vous enlevé vos chaussures ?",
+    arrivalMessage: "C'est le chaos dans le dojo. Et si vous rangiez un peu vos affaires ?",
     description: "Inscrivez le mot découvert pour avancer dans vos recherches.",
     answer: "TERRAIN"
   },
