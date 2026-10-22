@@ -521,10 +521,13 @@ document.querySelectorAll(".quick-btn").forEach(btn => {
 const START_DELAY_MS = 2 * 60 * 1000;
 let loginAt = 0;
 let startTimer = null;
+let startMsgSent = false;
 
-function scheduleStartButton() {
+// Le compte à rebours est basé sur l'heure réelle (loginAt) et vérifié par
+// intervalle : si le téléphone se met en veille, les minuteurs sont gelés
+// mais le temps écoulé est rattrapé au réveil.
+function checkStartButton() {
   const btn = document.getElementById("present-btn");
-  clearTimeout(startTimer);
   if (!state.team) {
     btn.hidden = true;
     return;
@@ -534,16 +537,29 @@ function scheduleStartButton() {
     btn.hidden = false;
     return;
   }
-  const remaining = START_DELAY_MS - (Date.now() - loginAt);
-  if (remaining <= 0) {
+  if (Date.now() - loginAt >= START_DELAY_MS) {
     btn.hidden = false;
-    return;
+    if (!startMsgSent) {
+      startMsgSent = true;
+      addBotMessage("Une fois rendu sur les lieux de votre première mission, cliquez sur « J'y suis ».");
+    }
+    clearInterval(startTimer);
+    startTimer = null;
+  } else {
+    btn.hidden = true;
   }
-  btn.hidden = true;
-  startTimer = setTimeout(() => {
-    scheduleStartButton();
-    addBotMessage("Une fois rendu sur les lieux de votre première mission, cliquez sur « J'y suis ».");
-  }, remaining);
+}
+
+function scheduleStartButton() {
+  clearInterval(startTimer);
+  startMsgSent = false;
+  checkStartButton();
+  if (state.team && state.team.toLowerCase() !== "admin") {
+    startTimer = setInterval(checkStartButton, 2000);
+    // Vérifier immédiatement au retour de veille / retour dans l'onglet
+    document.addEventListener("visibilitychange", checkStartButton);
+    window.addEventListener("focus", checkStartButton);
+  }
 }
 
 // ---------- Version ordinateur / téléphone ----------
