@@ -10,7 +10,7 @@ const GLOBAL_PASSWORD = "integration2026";
 // Sinon, le mot de passe global ci-dessus est utilisé.
 const TEAM_PASSWORDS = {
   "admin": "admin",
-  "EQUIPE1": "JAMCEJ",
+  "EQUIPE1": "AMJCEJ",
   "EQUIPE2": "LPYLKC",
   "EQUIPE3": "PJKALC",
   "EQUIPE4": "TDELAC"
