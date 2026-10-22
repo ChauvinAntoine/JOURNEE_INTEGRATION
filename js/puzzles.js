@@ -18,15 +18,15 @@ const PUZZLES = [
   {
     id: 1,
     title: "Bazar dans le dojo",
-    location: "LE DOJO",
-    arrivalMessage: "C'est le chaos dans le dojo. Et si vous rangiez vos affaires pour récupérer un premier indice ?",
+    location: "DANS LE DOJO",
+    arrivalMessage: "C'est le chaos dans le dojo. Et si vous rangiez vos affaires pour récupérer un premier indice ? MERCI D'ENLEVER VOS CHAUSSURES !",
     description: "Inscrivez le mot découvert pour avancer dans vos recherches.",
     answer: "TERRAIN"
   },
   {
     id: 2,
     title: "A la recherche des joueurs",
-    location: "LIEU INCONNU",
+    location: "EN LIEU INCONNU",
     autoPresent: true,
     arrivalMessage: "On a perdu Clément et Antoine... Mais où ont-ils pu passer ?",
     description: "Inscrivez le mot découvert pour avancer dans vos recherches.",
@@ -36,7 +36,7 @@ const PUZZLES = [
   {
     id: 3,
     title: "La vie de paparazzi",
-    location: "LA SALLE HAMON 3",
+    location: "DANS LA SALLE HAMON 3",
     arrivalMessage: "On dirait qu'une séance photos a eu lieu récemment, difficile de s'y retrouver...",
     description: "Inscrivez le mot découvert pour avancer dans vos recherches.",
     answer: "FINALE"
@@ -44,7 +44,7 @@ const PUZZLES = [
   {
     id: 4,
     title: "Mé-lignes-mélo",
-    location: "LE TERRAIN",
+    location: "SUR LE TERRAIN",
     arrivalMessage: "C'est le début du match : place à l'entre-deux !",
     description: "Inscrivez le mot découvert pour avancer dans vos recherches.",
     pdf: "images/enigme4.pdf",
@@ -53,15 +53,15 @@ const PUZZLES = [
   {
     id: 5,
     title: "Papiers toilette",
-    location: "LES WC",
-    arrivalMessage: "On dirait que les toilettes ont besoin d'un peu de nettoyage, il y a des papiers partout...",
+    location: "DANS LES WC",
+    arrivalMessage: "C'est bientôt l'heure de l'échauffement, le caca de stress vous rappelle à l'ordre.",
     description: "Inscrivez le mot découvert pour avancer dans vos recherches.",
     answer: "INDIVIDUEL"
   },
   {
     id: 6,
     title: "Décryptage dans le hall",
-    location: "LE HALL D'ENTREE",
+    location: "DANS LE HALL D'ENTREE",
     arrivalMessage: "Un hackeur est passé dans le coin, le texte est incompréhensible.",
     description: "Inscrivez le mot découvert pour avancer dans vos recherches.",
     answer: "MARQUEUR"
@@ -69,15 +69,15 @@ const PUZZLES = [
   {
     id: 7,
     title: "Choix tactiques",
-    location: "LE BANC",
-    arrivalMessage: "Temps mort : le coach souhaite mettre un système en place.",
+    location: "DANS LE VESTIAIRE DOMICILE",
+    arrivalMessage: "Mi-temps : le coach souhaite mettre un système en place.",
     description: "Inscrivez le mot découvert pour avancer dans vos recherches.",
     answer: "FOULE"
   },
   {
     id: 8,
     title: "Le voleur de lettres",
-    location: "LE VESTIAIRE VISITEURS",
+    location: "DANS LE VESTIAIRE VISITEUR",
     arrivalMessage: "On dirait que le coach adverse a discuté tactique avec ses joueurs, mais il nous manque des détails...",
     description: "Inscrivez le mot découvert pour avancer dans vos recherches.",
     answer: "PANIER"

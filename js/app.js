@@ -469,7 +469,7 @@ function sendAnswer(answer) {
         markPresented(next);
         showPuzzle(next);
       } else {
-        addBotMessage("Nouvelle étape : rendez-vous à " + next.location + ". Cliquez sur « J'y suis » quand vous êtes arrivé.");
+        addBotMessage("Nouvelle étape : rendez-vous " + next.location + ". Cliquez sur «J'y suis» quand vous êtes arrivé.");
       }
     } else {
       addBotMessage("Toutes les énigmes sont résolues, bravo ! Il est temps de retrouver les game masters.");
@@ -478,8 +478,7 @@ function sendAnswer(answer) {
     state.attempts[current.id] = (state.attempts[current.id] || 0) + 1;
     state.penaltyUntil = Date.now() + PENALTY_MS;
     save();
-    addBotMessage("Aïe... il va falloir réfléchir un peu plus visiblement.");
-    addBotMessage("Pénalité : vous ne pouvez plus donner de réponse pendant 2 minutes.");
+    addBotMessage("Aïe... il va falloir penser à réfléchir un jour. Pour la peine, deux minutes de pénalité.");
     updateHintBubble();
     updatePenaltyUI();
   }
