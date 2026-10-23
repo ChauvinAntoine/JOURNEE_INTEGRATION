@@ -501,6 +501,7 @@ function sendAnswer(answer) {
       }
     } else {
       addBotMessage("Toutes les énigmes sont résolues, bravo ! Il est temps de retrouver les game masters.");
+      addBotMessage("Gardez en tête que le collectif prime toujours sur l'individualité...");
     }
   } else {
     state.attempts[current.id] = (state.attempts[current.id] || 0) + 1;
