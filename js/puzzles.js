@@ -97,9 +97,9 @@ const PUZZLES = [
 // Chaque équipe fait les 8 énigmes, dans un ordre différent.
 // (admin suit l'ordre 1→8 pour les tests.)
 const ROUTES = {
-  "EQUIPE1": [1, 5, 7, 2, 4, 6, 3, 8],
+  "EQUIPE1": [1, 5, 7, 2, 6, 4, 3, 8],
   "EQUIPE2": [8, 2, 6, 3, 5, 1, 7, 4],
-  "EQUIPE3": [6, 3, 4, 1, 7, 2, 8, 5],
-  "EQUIPE4": [4, 7, 2, 5, 8, 3, 1, 6],
-  "admin":   [1, 2, 3, 4, 5, 6, 7, 8]
+  "EQUIPE3": [6, 4, 3, 1, 7, 2, 8, 5],
+  "EQUIPE4": [5, 7, 2, 4, 8, 3, 1, 6]
+  // "admin":   [1, 2, 3, 4, 5, 6, 7, 8]
 };
