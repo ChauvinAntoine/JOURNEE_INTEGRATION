@@ -49,7 +49,7 @@ const PUZZLES = [
     location: "SUR LE TERRAIN",
     arrivalMessage: "C'est le début du match : place à l'entre-deux !",
     description: "Inscrivez le mot découvert pour avancer dans vos recherches.",
-    pdf: "images/enigme4.pdf",
+    // pdf: "images/enigme4.pdf",
     answer: "LAY-UP"
   },
   {
