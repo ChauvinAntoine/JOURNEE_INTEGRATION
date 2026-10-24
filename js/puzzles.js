@@ -71,7 +71,7 @@ const PUZZLES = [
   {
     id: 7,
     title: "Choix tactiques",
-    location: "DANS LE VESTIAIRE DOMICILE",
+    location: "DANS LE VESTIAIRE F2",
     arrivalMessage: "Mi-temps : le coach souhaite mettre un système en place.",
     description: "Inscrivez le mot découvert pour avancer dans vos recherches.",
     answer: "FOULE"
@@ -79,7 +79,7 @@ const PUZZLES = [
   {
     id: 8,
     title: "Le voleur de lettres",
-    location: "DANS LE VESTIAIRE VISITEUR",
+    location: "DANS LE VESTIAIRE G2",
     arrivalMessage: "On dirait que le coach adverse a discuté tactique avec ses joueurs, mais il nous manque des détails...",
     description: "Inscrivez le mot découvert pour avancer dans vos recherches.",
     answer: "PANIER"

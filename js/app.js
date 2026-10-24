@@ -200,6 +200,8 @@ function addPdfMessage(src) {
 function renderChat() {
   chatMessages.innerHTML = "";
   addBotMessage("Bienvenue, " + state.team + " ! Résolvez les énigmes pour gagner des mots. À la fin, tous les mots vous aideront à ouvrir le local à ballons. Bonne chance !");
+  addBotMessage("Vous laisserez le matériel comme vous l'avez trouvé en arrivant sur les lieux.");
+  addBotMessage("Merci de respecter les consignes données au cours de la partie.");
   addBotMessage("RDV au plan d'évacuation.");
 
   if (PUZZLES.length === 0) {
